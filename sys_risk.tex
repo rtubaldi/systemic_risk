@@ -1,0 +1,588 @@
+\documentclass[11pt,a4paper,english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{babel}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\graphicspath{{/Users/roberto/Desktop/My Work/Latex/Figures/}}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{eurosym}
+\usepackage{tabularx}
+\usepackage[comma,authoryear]{natbib}
+\usepackage{caption} 
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{lscape}
+\usepackage{rotating}
+\usepackage{epstopdf}
+\usepackage{comment}
+\usepackage{datetime}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{subfig}
+\newcommand\Tstrut{\rule{0pt}{2.6ex}}         % = `top' strut
+\newcommand\Bstrut{\rule[-0.9ex]{0pt}{0pt}}   % = `bottom' strut
+\newdateformat{monthyeardate}{%
+	\monthname[\THEMONTH], \THEYEAR}
+\captionsetup[table]{skip=5pt}
+\title{An Option-implied Measure of Systemic Risk}
+\author{Roberto Tubaldi\thanks{Swiss Finance Institute at Universit\`{a} della Svizzera Italiana (USI), Institute of Finance, Via G. Buffi 13, CH-6900 Lugano, Switzerland. E-mail: \texttt{roberto.tubaldi@usi.ch}.}}
+
+\date{Preliminary version\\
+	\monthyeardate\today} 
+
+
+\begin{document}
+   \maketitle
+ \begin{abstract}
+ 	We exploit the special features of options prices to extract different measures of systemic risk. In particular, option prices provide an almost model free and forward-looking tool for risk measurements. We estimate systemic risk for 75 financial institutions during the period 2000-2015 using a two-step procedure that first evaluates individual firm's risks from option prices, and then exploits such measurements to gauge systemic risk.
+ \end{abstract}
+
+\medskip
+
+\noindent \textit{JEL classification}: G01, G13, G17, G20, G32.
+
+\medskip
+\noindent \textit{Keywords}: Systemic risk; VaR; Expected Shortfall; CoVaR; Option Prices.
+
+\newpage
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+\section{Introduction}
+After the global financial crisis of 2007-2009, measuring systemic risk became a central concern for both academics and regulators. A neat definition of systemic risk is hard to find in the literature. A report by the \citet{Fund2009} suggests that systemic risk "is often viewed as a phenomenon that is there when we see it". The seminal paper by \citet{Rochet1996} highlights that "systemic risk refers to the propagation of an agent’s economic distress to other agents linked to that agent through financial transactions".  In general, systemic risk arises from spillovers across financial institutions. The damaged financial system can, in turn, impair the real economy.
+
+From a theoretical point of view, the seminal works by \citet{Bernanke1989}, \citet{Bernanke1999}, and \citet{Kiyotaki1997} uncovered the feedback effects between the financial system and the real economy. \citet{Rochet1996} discuss systemic risk in a context of a model in which financial contagion arises from connectedness in the interbank market.  More recently, \citet{Brunnermeier2014} suggested the procyclicality of systemic risk in what they term "volatility paradox". In short, financial institutions are prone to take on more risk when volatility is low, hence endogenous systemic risk builds up when the risk that is exogenous to the financial system is small.
+
+Nevertheless, our paper focuses on the measurement of systemic risk. As suggested by the model of \citet{Acharya2017}, measuring systemic risk plays a key role in the realignment of incentives between banks and regulator through the imposition of a tax. Such a tax depends on the banks' expected default losses and, most importantly for our work, on their individual contribution to systemic risk. Most of the presented tools for measuring systemic risk are based, similarly to individual risk measures, upon statistical methods that infer from past data, providing backward-looking results. However, apart from the cross-sectional dimension of systemic risk, i.e. the one relative to the identification of systemically important financial institutions (SIFIs), is its time-series dimension that really matters\footnote{For further discussion on the two dimensions of systemic risk, we refer to \citet{Adrian2016}.}. In other words, it is important to capture the building up of systemic risk, described by the above mentioned "volatility paradox". 
+
+We contribute to the literature on systemic risk by exploiting the unique features of options prices to gauge the risk. Our approach has two main advantages. 
+
+First, it has long been known - at least from \citet{Breeden1978} - that options prices provide an almost model free tool to access information regarding the distribution of the underlying asset returns. In particular, we use the method developed in \citet{GBA16}\footnote{The method of \citet{GBA16} has been applied to the S\&P500 index \citep{Barone-Adesi2016}, and the oil market \citep{Barone-Adesi2016a}. This is the first application to individual stocks.} that links Value at Risk (VaR) and Expected Shortfall (ES) to the first partial derivative of the option price with respect to the strike price. Therefore, the first advantage of our approach over the existing measures of systemic risk is that we do not rely upon deep statistical assumptions to compute systemic risk since at each point in time VaR and ES can be extracted from two contiguous - in terms of moneyness - options prices. Hence, in this setting, measuring systemic risk is computationally fast and free from distributional assumptions. The lack of distributional assumptions in the option-implied risk measures also let the elicitability problem disappear. In short, elicitability refers to the problem of model selection for the losses distribution, when risk measures are computed using past data\footnote{This issue is mostly linked to ES. Even though it is technically superior than VaR, it suffers from the elicitability problem, making its practical implementation difficult. For further discussion on the desired technical properties of a risk measure, we refer to \citet{Artzner1999}, and \citet{Acerbi2002}. See instead \citet{Ziegel2016} for a review of the elicitability problem.}.
+
+Second, option prices are naturally forward-looking and anticipate future market scenarios. This is extremely valuable when considering systemic risk, given the presence of the volatility paradox. Past data, on which classical measures are usually based upon, are hardly informative of future risks, especially when the estimation window considers stable periods. When risk is gauged through option prices, the measure is forward-looking, and can be updated frequently using new information.
+
+Also, our VaR and ES estimates are free from the so-called “risk that the risk will change” \citep{Engle2009, Engle2011, Brownlees2011}. Most of the statistical risk measures rely on short-term historically based models, which are then extended to longer horizons often through unstable and imprecise model assumptions. However, the short-term risk is widely different than the long-term risk, thus the estimates tend to be biased. Options prices allow overcoming the issue relating to the time horizon since this is fixed by the maturity of the traded derivative contract. 
+
+We compute option-implied systemic risk with a 1-month horizon for a set of 75 financial institutions whose option is traded at the CBOE. We perform the analysis for the period from January 2000 to December 2015. We apply a 2-step procedure in which, first, we compute option-implied VaR and ES for each individual bank and the system as a whole\footnote{As explained in detail in section~\ref{sec: empirics}, we use different identifications of the "system".}, while in the second step we compute systemic risk using the individual risk measures derived in the first step. Before moving to the second step we backtest VaR and ES and find that the methodology used seems to be correctly specified. Overall, when comparing our systemic risk measurements with their analogue computed with other methods proposed in the literature, we find that the latter tend to underestimate systemic risk.  
+
+As suggested by \citet{Benoit2016} the literature on systemic risk can be divided into two main strands. The first studies specific sources of systemic risk and is mostly composed of models delivering empirically testable predictions on different channels of systemic risk. The second strand focuses on providing global measures of systemic risk, without taking a particular stand on the causes of systemic risk. Our analysis enters this second family, in that it provides an option-based approach that can be used when estimating such global systemic risk measures. The literature has developed several measures, and we refer to \citet{Benoit2016} for a detailed review. In what follows, we briefly discuss the most widely used. 
+
+The main advantage of the global measures is that they rely on publicly available market data, and, hence, they can be computed and updated in real time. However, as previously suggested, they deeply rely on statistical assumptions. Our approach aims at tempering this issue, at least in the computation of individual risks, through the use of options data in the estimation. The two most successful measures proposed by the literature are SRISK \citep{Acharya2012, Brownless2016}, and CoVaR \citep{Adrian2016}. On the one hand, SRISK is defined as the expected capital shortfall of an individual financial institution conditional on the system experiencing a crisis. SRISK is an extension of another measure proposed by \citet{Acharya2017}, MES (Marginal Expected Shortfall), which evaluates the marginal contribution of one firm to the risk of the system, defined as the Expected Shortfall of the market portfolio. \citet{Acharya2017} also propose SES (Systemic Expected Shortfall), which is similar to SRISK. The authors show that SRISK and SES are linear functions of bank's leverage and MES. On the other hand, CoVaR corresponds to the VaR of the system conditional on the financial entity being at its VaR level. \citet{Adrian2016} compute CoVaR from a quantile regression of system losses onto the losses of individual banks. \citet{Girardi2013} generalize CoVaR by defining it as the VaR of the system when the individual bank is at least at its VaR level, allowing the evaluation of more severe distress events, and backtesting the measure. SRISK and CoVaR are conceptually different in that they regard opposite direction of systemic risk. SRISK focuses on the individual bank's stress in a crisis period, while CoVaR concerns the system loss when the single institution is in distress. In the empirical part of the paper, we use the CoVaR approach to systemic risk. However, our method can readily be extended to SRISK. Finally, another interesting analysis of systemic risk is that of \citet{Billio2012} that exploit Granger causality and principal component analysis to measure connectedness between institutions.
+
+The rest of the paper is organized as follows. Section~\ref{sec: model} theoretically describes the approach suggested by \citet{GBA16} to derive option-implied VaR and ES, and explain how we apply it to systemic risk. Section~\ref{sec: data} describes the data used in the paper, while section~\ref{sec: empirics} analyses empirical results. As suggested above, we backtest VaR and ES before moving to the second step of our estimations. For the ease of exposition, we delay the analysis of backtesting to section~\ref{sec: backtesting}. Section~\ref{sec: conclusion} concludes.
+
+
+%----------------------------------------------------------------------------------------
+%	MEASURING SYSTEMIC RISK FROM OPTION PRICES
+%----------------------------------------------------------------------------------------
+\section{Measuring systemic risk from option prices}
+\label{sec: model}
+In this section, we present in detail our approach to systemic risk. Following \citet{Adrian2016}, we construct two measures of systemic risk both capturing tail dependency between the whole financial system and an individual institution. On the one hand, the first measure links the Value at Risk (VaR) of the system to individual VaRs. On the other hand, the second measure relates the Expected Shortfall (ES) of the system to that of a particular financial firm.
+
+Our procedure involves two steps. First, we compute option-implied VaR and ES as suggested by \citet{GBA16}, and obtain a panel of risk measures, in which the cross-sectional dimension is given by individual financial institutions and the financial system as a whole. Second, we measure institution \textit{i}'s systemic risk, exploiting the idea of CoVaR developed by \citet{Adrian2016}.
+
+Turning to the first step, let $S_0$ be the portfolio value at time zero, and $R$ its rate of return. Then, the portfolio value at some future time $T$ is $S=S_0(1+R)$. Now, let $K=S_0(1+R_K)$ be the lowest portfolio value at a given confidence level, $\alpha$, where $R_K$ is the rate of return relative to the state of the world where $K$ is realized. Then, VaR measures, for a given confidence level $\alpha$ and investment horizon $T$, the worst loss relative to the initial value of the portfolio \citep{Jorion2007}:
+\begin{equation}
+\label{eq: defvar}
+VaR \equiv S_0 - K \, .
+\end{equation}
+Note that, expressed in this way, VaR is a positive number.
+
+More generally, VaR identifies the worst possible realization, $K$, such that the probability that the future portfolio value, $S$, is smaller than $K$ is equal to $\alpha$, i.e.,
+\begin{equation}
+\label{eq: formalvar}
+\alpha=Pr(S\leq K)=\int_{-\infty}^{K}f(S)dS=F(K) \, ,
+\end{equation}
+where $f(S)$ is the probability distribution of future portfolio value, and $F(K)$ its cumulative distribution computed in $K$. In other words, VaR identifies the $\alpha$ quantile, $K$, of the portfolio value distribution\footnote{Stated differently, given equation~(\ref{eq: defvar}), VaR is itself the $1-\alpha$ quantile of the portfolio losses, $L(S)=S_0-S$, for a given investment horizon $T$.}.
+
+Expected Shortfall, ES, can be defined \citep{Embrechts1997} as the conditional expected loss, $L(S)=S_0-S$, beyond the VaR level, or,
+\begin{align}
+\label{eq: esdef}
+ES &= E[L(S)|S \leq K] =\frac{1}{\alpha}\int_{-\infty}^{K}L(S)f(S)dS \, ,
+\end{align} 
+where $E[\cdot|\cdot]$ is the conditional expectation operator\footnote{To understand why equation~(\ref{eq: esdef}) holds, note that, given a probability space $(\Omega, \mathcal{F}, Pr)$ and a random variable $X$, the expected return of $X$ with respect to an event $A\in \mathcal{F}$, with strictly positive probability, is $E[X|A]=E[X1_{A}]/Pr(A)$, where $1_{A}$ is the indicator function of $A$. In our case $A=\{S\leq K\}$, and $Pr(S \leq K)=\alpha$.}.
+
+Let us now turn to option pricing. It is well known that the price, $p$, at time zero of a put option with maturity $T$ and strike price $K$, where the underlying asset is a portfolio with price process, $S$, is given by,
+\begin{equation}
+\label{eq: putprice}
+p = e^{-rT}E^{\mathbb{Q}}[(K-S)^{+}]=e^{-rT}\int_{0}^{K}(K-S)f^{\mathbb{Q}}(S)dS \, ,
+\end{equation}
+where, $r$ is the risk-free rate\footnote{For simplicity, here, we let $r$ be constant. However, in the empirical application $r$ will be time-varying.}, and $\mathbb{Q}$ indicates that we are operating under the risk-neutral measure. 
+
+Taking the derivative of equation~(\ref{eq: putprice}) with respect to the strike price $K$, we have,
+\begin{equation}
+\label{eq: deriv}
+\frac{\partial p}{\partial K}= e^{-rT}\int_{0}^{K}f^{\mathbb{Q}}(S)dS = e^{-rT}F^{\mathbb{Q}}(K).
+\end{equation}
+
+As discussed in \citet{GBA16}, as the time horizon goes to zero, the risk-neutral distribution, $f^{\mathbb{Q}}(S)$, converges to its physical counterpart, $f(S)$. Therefore, assuming limited liability, one can adjust the lower limit of the integral in~(\ref{eq: formalvar}), and relate equations~(\ref{eq: formalvar}) and~(\ref{eq: deriv}) to obtain,
+\begin{equation}
+\label{eq: link}
+\alpha =F(K)=\int_{0}^{K}f(S)dS=e^{rT}\frac{\partial p}{\partial K} \, .
+\end{equation}
+
+Hence, VaR is related to the put option price in that the value $K$, representing the worst future portfolio value, is the strike price that makes the derivative of the put price with respect to the strike price exactly equal to $\alpha$ compounded at the risk free rate.
+
+Note that the structure of the put option data allows for a naturally time-varying estimates of VaR and ES. In particular, the two key equations in the estimation of the risk measures at time $t$ with horizon $T$, and confidence level $\alpha$ are,
+
+\begin{equation}
+\label{eq: var}
+VaR^{i, \alpha}_{t,T}= S^i_t - K^{i,\alpha}_{t,T}
+\end{equation}
+\begin{equation}
+\label{eq: es}
+ES^{i,\alpha}_{t,T} = VaR^{i, \alpha}_{t,T} + e^{r_{t,T}\cdot (T-t)}\, \frac{p^{i}_{t,T}(K^{i,\alpha}_{t,T})}{\alpha} \, ,
+\end{equation}
+where $S^i_t$ is the price of firm $i$'s underlying stock at time $t$; $K^{i,\alpha}_{t,T}$ is the strike price at time $t$ relative to the $\alpha$ level for an option with maturity $T$\footnote{Section~\ref{sec: empirics} explains how this strike price is empirically identified.}; $r_{t,T}$ is the zero-rate at time $t$ for a maturity equal to $T$, and $p^{i}_{t,T}(K^{i,\alpha}_{t,T})$ is the price of firm $i$'s put option at time $t$ with maturity $T$, and strike price $K^{i,\alpha}_{t,T}$. Equation~(\ref{eq: es}) is derived by substituting (\ref{eq: link}) into (\ref{eq: esdef}), and using $L(S)=S_0-S=(S_0-K)+(K-S)$. 
+
+The advantages of the method are now apparent. On the one hand, equation~(\ref{eq: link}) allows the estimation of the probability of ending up in the left tail of the distribution of future portfolio values with almost no assumptions regarding the nature of such a distribution. In practice, one can rely on numerical approximation when computing the derivative in equation~(\ref{eq: link}). On the other hand, VaR and ES must be computed with regards to the distribution of \textit{future} portfolio value. Being future market's beliefs embedded in option prices, this method becomes naturally forward looking.
+
+Equations~(\ref{eq: var}) and~(\ref{eq: es}) provide individual risk measures. However, measuring systemic risk envisages estimating how the distress of one single entity affect the system as a whole (or vice-versa).
+
+As discussed in the introduction, systemic risk is directional, i.e., one can consider either the effect of bank \textit{i}'s distress on the financial system or how bank \textit{i} behaves in the context of a systemic crisis. In this paper, by using a CoVaR-like measure we assume the first interpretation of systemic risk. Nevertheless, option-implied expected shortfall can be also used to explore the other direction of systemic risk, estimating measures similar to those developed in \citet{Acharya2017} and \citet{Brownless2016}. The advantage over these measures would still rely on the fact that we don't make any particular distributional assumption in computing the Expected Shortfall.
+
+\citet{Adrian2016} define $CoVaR_{\alpha}^{system|i}$ as the VaR of the financial system conditional on institution \textit{i} being at its VaR level. In other words, it is the quantile $\alpha$ of the conditional distribution,
+\begin{equation}
+\label{eq: covardef}
+Pr(L^{system}(S)\geq CoVaR_{\alpha}^{system|i}|L^i(S)=VaR^i_{\alpha})=\alpha \, ,
+\end{equation}
+where $L^j(S)$, $j=\{system, i\}$, expresses the loss on the portfolio value.
+
+Using the definition of CoVaR in equation~(\ref{eq: covardef}), in the empirical application, we compute two measures of systemic risk from option-implied VaR and ES. First, we estimate CoVaR from an OLS regression of $VaR^{system}$ onto $VaR^i$. Second, we define CoES as the fitted value of regressing $ES^{system}$ onto $ES^{i}$. Further detail is given in section~\ref{sec: sysri emp}.
+%----------------------------------------------------------------------------------------
+%	THE DATA
+%----------------------------------------------------------------------------------------
+\section{The Data}
+\label{sec: data}
+All the data are from OptionMetrics IvyDB US, which provides historical option and underlying stock price, implied volatility, and sensitivity information for the entire US listed index and equity options markets. We estimate the systemic risk measures discussed in section~\ref{sec: model} for the 75 financial institutions described in Table \ref{tab: firms77}. Following \citet{Acharya2017}, we divide the universe of financial institutions in 4 categories. Namely, depositories (2-digit sic code 60), insurances (2-digit sic codes 63-64), broker-dealers (4-digit sic code 6211), other (non-depositories: 2-digit sic codes 61, 62 (except 6211), 65, 67). 
+
+The OptionsMetrics database starts in 1996. However, due to the scant liquidity in the options market before 2000, we select the time period 2000-2015, which is nevertheless capable of capturing the financial crisis of 2007-2009. When performing the analysis using the financial sector ETF (XLF) as "the system", we restrict the analysis to the period 2008-2015. A description of this ETF is given in section~\ref{sec: sysri emp}. Table~\ref{tab: XLF_hold} describe the composition of XLF as of April 2017. 
+
+The measurement of systemic risk is performed using put options with 30 days to maturity. At each date and for each company, we have an option surface spanned by the different strike prices traded in the market. We apply standard filters to the raw dataset by retaining observations with: (i) strictly positive open interest, (ii) strictly positive bid and ask prices, (iii) offer price greater than bid price, (iv) non-missing implied volatility (this last filter discards options that do not satisfy no-arbitrage bounds).   Table~\ref{tab: indgroup77_liquidity} shows the summary statistics for this option surface. 
+
+OptionMetrics also provides data on dividends. We use such information to compute the ex-dividend price of the underlying asset used in the \citet{Black1973} and \citet{Merton1973} option pricing formula, as we will discuss in section \ref{sec: empirics}. Finally, using OptionMetrics' \textit{Zero Curve File}, we linearly interpolate the daily risk-free interest rates (with a 30-day horizon) between the closest rates in the zero curve\footnote{The zero curve provided by OptionMetrics is derived from ICE IBA LIBOR rates and settlement prices of CME Eurodollar futures.}.
+
+
+%----------------------------------------------------------------------------------------
+%	EMPIRICAL ANALYSIS
+%----------------------------------------------------------------------------------------
+\section{Empirical Analysis}
+\label{sec: empirics}
+In the following, we bring to the data the 2-step methodology for computing systemic risk developed in section~\ref{sec: model}.  Section \ref{sec: vares emp} describes the evaluation of option-implied VaR and ES, while section \ref{sec: sysri emp} discuss the results for our systemic risk measures. 
+
+\subsection{Value at Risk and Expected Shortfall}
+\label{sec: vares emp}
+The first step consists in extrapolating Value at Risk and Expected Shortfall from option prices.
+The option-implied VaR and ES formulae are based on the identification of the strike price relative to the confidence level, $\alpha$, chosen for the analysis. In other words, the required strike price is such that the derivative of the put option price with respect to the strike price at that point is equal to $\alpha$ compounded at the risk-free rate. 
+
+In order to perform this identification procedure, for each day $t$ and for each company $i$, we approximate the derivative in equation (\ref{eq: link}) and compute $\alpha$ from two contiguous strike prices $K^i_{t,1}$ and $K^i_{t,2}$, with $K^i_{t,2}>K^i_{t,1}$ as:
+\begin{equation}
+\label{eq: alpha emp}
+\alpha = e^{r_{t}\cdot (T-t)}\frac{p^i_{t}(K^i_2)-p^i_{t}(K^i_1)}{K^i_{2}-K^i_{1}} \, ,
+\end{equation}
+where $r_{t}$ is the risk-free rate at date $t$, while $p^i_{t}(K_v)$ is the put option price with a strike price equal to $K^i_v$ for company $i$ at time $t$. To ease the notation, we omit the information regarding the maturity of both the put option and the zero rate, which are set equal to 1 month. The choice of such a maturity implies that our risk measures are 1-month ahead forecasts, and it is driven by the good availability of data for 30-days put options. Finally, the strike price needed to compute VaR and ES is, at a first order approximation, the mid-point between $K^i_{1}$ and $K^i_{2}$. Such a procedure implies that $\alpha$ increases when we move closer to the money. Hence, the smaller the $\alpha$, the more the put option is out-of-the-money\footnote{To see this, consider for example the second derivative of the put option with respect to the strike price. Given the \citet{Black1973} and \citet{Merton1973} solution, it can be shown that this is positive.}.
+
+In the main analysis, we choose a confidence level of $5\%$ and compare the results when $\alpha$ is either $10\%$ or $15\%$. Nevertheless, equation (\ref{eq: alpha emp}) hardly gives an exact number. Therefore, we derive the required confidence level, its strike price, and the put option implied volatility trough linear interpolation between two contiguous observations. Note that the option-implied VaR and ES formulae are valid only for contracts with the European style feature. However, individual stock and ETF options are American. OptionMetrics reports data on implied volatility computed by running CRR model iteratively, and taking into account the American feature of the data. We then plug this implied volatility in the \citet{Black1973} and \citet{Merton1973} formula in order to retrieve the corresponding European option price used for VaR and ES computations. To the best of our knowledge, a similar approach has been used in \citet{Christoffersen2015} and \citet{Kelly2016}. 
+
+
+Given the confidence level, the strike price, and the put option price we can easily compute VaR and ES, using equations~(\ref{eq: var}) and (\ref{eq: es}). Table~\ref{tab: 5_perc}-\ref{tab: 15_perc} show the summary statistics for VaR and ES at different confidence levels. As expected, the risk measures (as a percentage of the underlying stock price) are decreasing functions of $\alpha$. Intuitively, as $\alpha$ increases, the risk measure becomes less conservative and thus its value decreases. Also, ES tends to be, by construction, higher than VaR, but their ratio seems to be pretty stable throughout the sample. Another feature shown in Tables~\ref{tab: 5_perc}-\ref{tab: 15_perc} is that the number of observations increases with alpha. This is due to the fact that as we move toward the money, there is greater data availability. 
+
+Looking at the time series dimension, we find that, at all the confidence levels considered, VaR and ES spike during the financial crisis of 2007-2009, correctly reflecting the period of high turmoil. Figures~\ref{fig: varcts5}-\ref{fig: varcts15} plot the time-series of VaR and ES for the cross-sectional average of different industries, while figures~\ref{fig: varctsmkt5}-\ref{fig: varctsmkt15} display the same time-series for S\&P500 and XLF.
+
+\subsection{Systemic risk}
+\label{sec: sysri emp}
+In the second step, we compute different measures of systemic risk. As explained in section~\ref{sec: model}, we gauge systemic risk using the idea of CoVaR developed by \citet{Adrian2016}.
+
+Moreover, we extend the analysis of \citet{Adrian2016} in that we also compute systemic risk looking at the expected shortfall (ES). The advantage is that ES has all the desirable theoretical properties (coherence and elicitability) that VaR lacks.
+
+Under this framework, the evaluation of systemic risk involves the identification of a "system". A natural choice would be the portfolio composed of all the financial industries in a region\footnote{This is the choice made by \cite{Adrian2016} in the published paper.}. The asset closest to such a portfolio is the Financial Sector exchange traded fund (ETF). This ETF is identified as XLF, and belongs to the family of Select Sector SPDRs. These are unique ETFs that divide the S\&P500 into ten sector index funds. Together these ten ETFs represent the S\&P500 as a whole. The investment purpose is to replicate the return performances, before expenses, of stocks represented in the different sectors. The CBOE trades American-style option contracts on XLF. These options were first quoted in 1999. However, the lack of liquidity does not allow a meaningful analysis before 2008. Therefore, we decide to identify the system with the S\&P500, whose option shows preferable liquidity features. Nonetheless, for comparison, we perform the analysis using XLF for the sub-sample 2008-2015.
+
+To measure systemic risk, we run, for each firm, the following time-series regressions on monthly data:
+\begin{align}
+\label{eq: regressions}
+VaR^{system|i}_{\alpha,t} &= a_{\alpha}^{system|i} + b_{\alpha}^{system|i}VaR_{\alpha,t}^{i}+\varepsilon_{{\alpha},t}^{system|i} \; , \\
+ES^{system|i}_{\alpha,t} &= a_{\alpha}^{system|i} + b_{\alpha}^{system|i}ES_{\alpha,t}^{i}+\varepsilon_{\alpha,t}^{system|i}.
+\end{align}
+The fitted values of these regressions\footnote{We also run a non-reported check for the linearity of the relation between the VaR of the system and the individual VaRs. The alternative hypothesis is that of a quadratic function. However, this specification does not bring any significant information.} give the two measures of systemic risk:
+\begin{align}
+\label{eq: fitted1}
+CoVaR^{i}_{\alpha,t} &= \hat{a}_{\alpha}^{system|i} + \hat{b}_{\alpha}^{system|i}VaR_{\alpha,t}^{i} \; , \\
+\label{eq: fitted2}
+CoES^{i}_{\alpha,t} &= \hat{a}_{\alpha}^{system|i} + \hat{b}_{\alpha}^{system|i}ES_{{\alpha},t}^{i}.
+\end{align}
+
+In order to get a better comparison with the results in \citet{Adrian2016}, we also compute $\Delta CoVaR$, which is defined by the authors as the CoVaR at the desired $\alpha$-level in excess of the CoVaR computed when institution $i$'s VaR is at its median level:
+\begin{align}
+\label{eq: deltacov}
+\Delta CoVaR^i_{\alpha,t} = CoVaR^i_{\alpha,t}-CoVaR^i_{50,t}.
+\end{align}
+
+In our empirical application, in order to have a VaR at the 50\% level exactly on the dates where we have a VaR at the $\alpha$ level, we compute the median Value at Risk as the median monthly loss\footnote{Note that results discussed in the last paragraph of this section do not change when we compute median-VaR using option prices. However, in order not to lose observations we decide to use the median monthly loss.}.
+
+Tables~\ref{tab: regr77_5sum}-\ref{tab: regr77_15sum} show the results of our estimates of equations~(\ref{eq: fitted1})-(\ref{eq: fitted2}) at different confidence levels (5\%,10\%, and 15\%, respectively), and identifications of the "system". In all the three tables, columns (1) and (3) refer to CoVaR and CoES, respectively, when the S\&P500 is chosen as the "system", while (2) and (4) to CoVaR and CoES, respectively, with Financial Sector ETF as the "system". The tables report the sample average measures of systemic risk, t-statistics (in brackets), and adjusted-$R^2$. As expected, the magnitude of systemic risk tends to increase when we switch from CoVaR to CoES, given that expected shortfall captures more extreme events. Overall, systemic risk increases and the model tends to have better properties in terms of t-statistics and $R^2$, when the Financial Sector ETF is chosen as the "system". This is not an unexpected outcome, given that XLF represents, by nature, a better proxy for the financial system. Nonetheless, we retain from making strong statements on this issue, given the lower sample period employed for the XLF specification. As a preliminary check for the robustness of the measures, we plot in figure~\ref{fig: isvsoos} the in sample and out of sample time-series of CoVaR at the 95\% confidence level for four large institutions in the different industry groups, when the S\&P500 is the "system". The four financial institutions are AIG, American Express (AXP), Goldman Sachs (GS), and JP Morgan Chase (JPM). On the one hand, the in sample measure is estimated on the entire sample. On the other hand, the out of sample measure is a 1-month ahead forecast of CoVaR, where the first estimation is made using half of the institution's sample, and a moving window is then employed.
+
+Finally, we compare our option-implied systemic risk measure with the quantile regression approach used in \citet{Adrian2016}, by estimating equation~(\ref{eq: deltacov}). In doing so, we choose $\alpha=5\%$, and the S\&P500 as the "system". Table~\ref{tab: comparison} shows the summary statistics for $\Delta$CoVaR computed for each of the four sub-industries considered. Overall, the option-implied measure tends to be greater in magnitude and exhibit wider within group dispersion, as suggested by the higher standard deviation figure. Looking at the time-series, figure~\ref{fig: tscomp} shows industry averages over time. The red line shows the dynamics of option-implied $\Delta$CoVaR, while quantile regression $\Delta$CoVaR is drawn in blue. Given the sizeable difference in magnitude of the two measures, we consider two different scales for the y-axis, in order to better enjoy time-series variation. The within-group correlation between the two measures ranges from 51 (insurances) to 62\% (broker-dealers). Interestingly, during the financial crisis of 2007-2009 (shaded line), the option-implied measure seems to start increasing few months before when depositories and non-depositories financial institutions are considered. This might suggest some anecdotal evidence that the option-implied measure might better capture the time-series dimension of systemic risk. With regards to the broker-dealers group, it is worth nothing that the two measures are quantitatively the same at the onset of the financial crisis in December 2007. However, the option-implied measure keeps increasing almost monotonically throughout the turmoil period, while the other measure seems to have a more "jagged" dynamics. This pattern seems to be confirmed in all of the four sub-groups considered.
+
+%----------------------------------------------------------------------------------------
+%	BACKTESTING
+%----------------------------------------------------------------------------------------
+\section{Backtesting}
+\label{sec: backtesting}
+A good risk measure is such only if it is able to reasonably forecast future risks. Backtesting validates risk measures using realized data. This section describes the tests performed in this paper and discusses the results.
+
+\subsection{Backtesting VaR}
+\label{sec: varback}
+In order to backtest VaR, we employ \citet{Kupiec1995} and \citet{Christoffersen1998} tests, which are both based on the evaluation of the failure rate, i.e. the proportion of times VaR forecasts are exceeded by realized losses. Intuitively, given a confidence level $\alpha$ for the VaR estimation, the null hypothesis is that the realized failure rate is indeed equal to $\alpha$. Note that, as suggested for example in \citet{Jorion2007}, these tests make no assumptions about the actual loss distribution, i.e. they are fully nonparametric. 
+
+With regards to our definition of option-implied VaR, we experience an exceedance whenever the put option expires in-the-money. Let us define the sequence of exceedances for institution \textit{i} at a future date $T$ when the option expires as,
+\begin{equation}
+\label{eq: violations}
+I^i_{T} =
+\begin{cases}
+1 \quad \textrm{if} \, S^i_T\leq K \\
+0 \quad \textrm{otherwise}
+\end{cases}
+\end{equation}
+where $S_T^i$ is the underlying stock $i$'s price at time $T$, and $K$ the strike price of the option considered in the estimation of VaR.
+
+With the definition of exceedances sequence in mind, we define two desirable properties of the VaR measure: (i) \textit{unconditional coverage}, and (ii) \textit{conditional coverage}. The former is satisfied if the unconditional probability that $I_T^i$ is equal to $1$ is exactly equal to $\alpha$, i.e., $Pr(I_T^i=1)=\alpha$. In other words, the unconditional coverage property is satisfied if the following null hypothesis is true:
+\begin{equation}
+\label{eq: kupiec null}
+H_0: E[I_T^i] = \alpha,
+\end{equation}
+where $E[I_T^i]$ is the unconditional expectation of the exceedances process. Define $N^i=\sum_{j=1}^{N^i}I_j^i$ as the total number of exceedances for firm \textit{i}, and $M^i$ the number of observations for firm \textit{i} in the sample. Then, omitting the \textit{i} superscript, $\pi=N/M$ is the failure rate observed in the sample and, if the model is correctly specified, it should give an unbiased estimation of $\alpha$. \citet{Kupiec1995} suggests to test the null in (\ref{eq: kupiec null}) through the following likelihood ratio:
+\begin{equation}
+\label{eq: lruc}
+LR_{uc} = -2ln[(1-\alpha)^{M-N}\alpha^N]+2ln[(1-\pi)^{M-N}\pi^N],
+\end{equation}
+which is asymptotically distributed as a $\chi^2(1)$.
+
+Conversely, the conditional coverage property is twofold. First, as before, it requires that the average number of exceedances is in line with the chosen confidence level. Second, and most importantly, it implies that exceedances should not cluster over time. To formalize the null hypothesis of time-independence of the exceedances, let us assume that (\ref{eq: violations}) is time-dependent, and described by a first-order Markov sequence with transition probability matrix:
+\begin{equation}
+\label{eq: transmat}
+\Pi=\begin{bmatrix}
+1-\pi_{0} & \pi_0 \\
+1-\pi_1 & \pi_1
+\end{bmatrix},
+\end{equation}
+where $\pi_s$, $s=\{0,1\}$, is the probability of observing an exceedance conditional on state $s$ the previous period. Then, the null hypothesis for the conditional coverage test is:
+\begin{equation}
+\label{eq: chris null}
+H_0: E_t[I_T^i]=\pi=\pi_{0}=\pi_{1}.
+\end{equation}
+\citet{Christoffersen1998} proposes a test of the independence property based on the following likelihood ratio:
+\begin{multline}
+\label{eq: lrind}
+LR_{ind} = -2ln[(1-\pi)^{(M_{00}+M_{10})}\pi^{(M_{01}+M_{11})}] +\\
+2ln[(1-\pi_0)^{M_{00}}\pi_0^{M_{01}}(1-\pi_1)^{M_{10}}\pi_1^{M_{11}}] \, ,
+\end{multline}
+where $M_{ij}$ is the number of periods in which state \textit{j} occurred after an occurrence of state \textit{i}. This likelihood ratio is distributed as a $\chi^2(1)$. 
+
+Finally, the conditional coverage property can be tested through a likelihood ratio defined as the sum of equations (\ref{eq: lruc}) and (\ref{eq: lrind}): 
+
+\begin{equation}
+\label{eq: lrcc}
+LR_{cc}=LR_{uc}+LR_{ind} \, ,
+\end{equation}
+and, as such, it is distributed as $\chi^2(2)$.
+
+Table~\ref{tab: backvar} reports the industry average results for the test statistics in equations~(\ref{eq: lruc})-(\ref{eq: lrcc}) together with their p-values. The last column shows the average failure rate. This last figure seems roughly in line with the corresponding $\alpha$-level, with the exception of XLF when $\alpha=10\%$. Note that, ideally, $\pi$ should be asymptotically equal to $\alpha$. This is confirmed by the fact that we accept, on average, the null of unconditional coverage for every group and all $\alpha$ specification, with a Type I error rate of $5\%$. Finally, the exceedances seem not to cluster over time. Hence, on average, we are able to accept both independence and conditional coverage property. 
+
+\subsection{Backtesting ES}
+\label{sec: esback}
+By definition, ES is the expected loss beyond VaR, or "the average loss in the worst $\alpha \%$ cases" \citep{Acerbi2002}. Therefore, what we would like to backtest is that the expected loss in excess of the VaR level predicted by our measure is indeed equal to the realized loss in the worst $\alpha\%$ scenario:
+\begin{equation}
+\label{eq: backes}
+H_0: E[(ES^i_{t,T}-VaR^i_{t,T})-L^i_{T}|L^i_{T}>VaR^i_{t,T}]=0,
+\end{equation}
+where $L^i_{T}$ is the realized loss for firm $i$ at time $T$. In other words, what we are testing is that the predicted loss over the VaR is equal, in expectation, to the realized loss in the worst $\alpha\%$ cases.
+
+Within our option market framework, the testable hypothesis (\ref{eq: backes}) translate into a test of its unbiased estimator described by,
+\begin{equation*}
+\frac{1}{N}\sum_{t=1}^{N}[(ES^i_{t,T}-VaR^i_{t,T})-(K-S^i_T)]I^i_{T} =0\, ,
+\end{equation*}
+or,
+\begin{equation}
+\label{eq: unbiasedes}
+\frac{1}{N}\sum_{t=1}^{N}\bigg[\bigg(e^{r_t\cdot (T-t)}\frac{p^i_{t}}{\alpha}\bigg)I^i_{T}\bigg]=\frac{1}{N}\sum_{t=1}^{N}\bigg[(K-S^i_T)I^i_{T}\bigg]\, ,
+\end{equation}
+where $N$ and $I^i_{T}$ are defined as in section~\ref{sec: varback}, $p^i_{t}$ is the price of a put option on firm \textit{i}'s stock at time \textit{t} with maturity \textit{T}, and strike price \textit{K} and $S^i_T$ is the underlying stock price at expiration.
+
+Table~\ref{tab: ttest5} shows the results for a t-test of the null in (\ref{eq: unbiasedes}). We report industry averages for the left and right-hand side of equation~(\ref{eq: unbiasedes}) under the columns forecast, and realized, respectively. The table also displays the industry average for their difference, and p-value of the t-test. Overall, we are able to accept, on average, the null of good specification when $\alpha=\{5\%,10\%,15\%\}$, at the usual significance levels. The only exception is the S\&P500 when $\alpha$ is at the 5\% level. 
+
+%----------------------------------------------------------------------------------------
+%	CONCLUSION
+%----------------------------------------------------------------------------------------
+\section{Conclusion}
+\label{sec: conclusion}
+After the financial crisis of 2007-2009, academics and regulators started paying attention to systemic risk measurement, and the literature on this topic flourished. However, most of the proposed systemic risk measures rely on statistical assumptions and past data. We exploit the unique features of options prices to compute systemic risk. We adopt a two-step procedure. First, we derive option-implied VaR and ES as suggested by \citet{GBA16}, and then we compute two systemic risk measures a-la-CoVaR \citep{Adrian2016}. CoVaR is defined as the VaR of the financial system when a particular institution is in distress. Two main advantages arise from using option prices. On the one hand, first-step estimations are almost model free, in that no assumption is made regarding the distribution of future portfolio value. On the other hand, options embed future market's beliefs, hence providing risk measures that are forward-looking by nature. We apply such a method to 75 financial institutions for the period 2000-2015 and find that, when compared to our approach, existing methods seem to underestimate systemic risk, and increased risk is captured with some delay. 
+
+
+
+
+%----------------------------------------------------------------
+% REFERENCES
+%----------------------------------------------------------------
+\newpage
+\bibliographystyle{apalike}
+\bibliography{Bibliography}
+
+%----------------------------------------------------------------
+% APPENDIX A
+%----------------------------------------------------------------
+\newpage
+\section*{Appendix}
+\addcontentsline{toc}{section}{Appendices}
+\renewcommand{\thesubsection}{\Alph{subsection}}
+
+\subsection{Tables}
+
+\input{Tables/XLF_hold.tex}
+
+\begin{sidewaystable}
+	\centering
+	\resizebox{0.6\width}{!}{\input{Tables/firms77.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{List of companies in the dataset.}
+	}
+	\label{tab: firms77}
+\end{sidewaystable}
+
+
+
+\begin{table}[H]
+	\centering
+	\resizebox{1\width}{!}{\input{Tables/indgroup77_liquidity.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Average put option liquidity.}
+		The table reports the number of observations and sample average of bid-ask spread, volume, and open interest for the put options on the 75 financial institutions' stocks that compose the dataset. The statistics are computed at the industry group level. The S\&P500 and the Financial Sector SPDR (XLF) are considered separately. The period spanned is 2000-2015.
+	}
+	\label{tab: indgroup77_liquidity}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\input{Tables/5_perc.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Summary statistics for VaR, ES and ES/VaR ratio by industry group with $\alpha=5\%$ (2000-2015)}. The table reports min, max, median, mean, and number of observations for the universe of financial institutions considered in the analysis. Summary statistics are computed within each industry subset (as defined in section~\ref{sec: data}), when the confidence level is set equal to 5\%. All the data expressed in percentage of the underlying stock price, with the exception of the ES/VaR ratio.
+	}
+	\label{tab: 5_perc}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\input{Tables/10_perc.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Summary statistics for VaR, ES and ES/VaR ratio by industry group with $\alpha=10\%$ (2000-2015)}. The table reports min, max, median, mean, and number of observations for the universe of financial institutions considered in the analysis. Summary statistics are computed within each industry subset (as defined in section~\ref{sec: data}), when the confidence level is set equal to 10\%. All the data are expressed in percentage of the underlying stock price, with the exception of the ES/VaR ratio.
+	}
+	\label{tab: 10_perc}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\input{Tables/15_perc.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Summary statistics for VaR, ES and ES/VaR ratio by industry group with $\alpha=15\%$ (2000-2015)}. The table reports min, max, median, mean, and number of observations for the universe of financial institutions considered in the analysis. Summary statistics are computed within each industry subset (as defined in section~\ref{sec: data}), when the confidence level is set equal to 15\%. All the data are expressed in percentage of the underlying stock price, with the exception of the ES/VaR ratio.
+	}
+	\label{tab: 15_perc}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\input{Tables/regr77_5sum.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Systemic risk measures ($\alpha=5\%$).} The table reports the average measures of systemic risk, the average t-statistics (in parenthesis), and adjusted-$R^2$ with a confidence level equal to 5\%. Columns 1 and 2 show the results for CoVaR when the system is identified as the S\&P500, and the Financial Sector ETF (XLF), respectively. Columns 3 and 2 show the two different specifications for CoES. The systemic risk measures and the adjusted-$R^2$ are expressed in percentage points.
+	}
+	\label{tab: regr77_5sum}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\input{Tables/regr77_10sum.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Systemic risk measures ($\alpha=10\%$).} The table reports the average measures of systemic risk, the average t-statistics (in parenthesis), and adjusted-$R^2$ with a confidence level equal to 10\%. Columns 1 and 2 show the results for CoVaR when the system is identified as the S\&P500, and the Financial Sector ETF (XLF), respectively. Columns 3 and 2 show the two different specifications for CoES. The systemic risk measures and the adjusted-$R^2$ are expressed in percentage points.
+	}
+	\label{tab: regr77_10sum}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\input{Tables/regr77_15sum.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Systemic risk measures ($\alpha=15\%$).} The table reports the average measures of systemic risk, the average t-statistics (in parenthesis), and adjusted-$R^2$ with a confidence level equal to 15\%. Columns 1 and 2 show the results for CoVaR when the system is identified as the S\&P500, and the Financial Sector ETF (XLF), respectively. Columns 3 and 2 show the two different specifications for CoES. The systemic risk measures and the adjusted-$R^2$ are expressed in percentage points.
+	}
+	\label{tab: regr77_15sum}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\input{Tables/comparison.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Different estimation methods.} The table reports the industry-level summary statistics for $\Delta$CoVaR. For each industry group, the first row reports minimum, maximum, mean, median, and standard deviation for the option-implied $\Delta$CoVaR, while the second row reports the same statistics when $\Delta$CoVaR is computed using quantile regression as in \citet{Adrian2016}. All estimates use $\alpha = 5\%$.
+	}
+	\label{tab: comparison}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{1\textwidth}{!}{\input{Tables/backvar.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Backtesting Value at Risk.} The table reports test statistic and p-values (industry averages) for the \citet{Kupiec1995} and \citet{Christoffersen1998} tests described in section~\ref{sec: varback} at different $\alpha$ levels. The sample failure rate is also reported in the last column. Tests are performed for the forecasts of VaR over the period 2000-2015.
+	}
+	\label{tab: backvar}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\resizebox{1\width}{!}{\input{Tables/ttest5.tex}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Backtesting Expected Shortfall.} The table reports results (industry averages) for the ttest on Expected Shortfall described in section~\ref{sec: esback} at different $\alpha$ levels. The second column reports the average forecasted loss over VaR, while the third column displays the average realized loss in the worst $\alpha\%$ scenario. Column four reports the average difference between "Forecast" and "Realized". We test the null that this difference is zero. Average p-values are reported in the last column. The test is performed for the forecasts of ES over the period 2000-2015.
+	}
+	\label{tab: ttest5}
+\end{table}
+
+
+
+%----------------------------------------------------------------
+% APPENDIX B
+%----------------------------------------------------------------
+\newpage
+\subsection{Figures}
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\includegraphics{Figures/varc77ts5.pdf}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Time-series of VaR and ES for different industries ($\alpha=5\%$).}
+		The figure shows the time-series of VaR (red line) and ES (blue line) at the 95\% confidence level for the cross-sectional averages of the different industries in the dataset. Breaks in the lines represent missing data. The y-axis is rescaled in each panel. The period spanned is January 2000 - December 2015. Data are expressed in percentage of the underlying stock price. The shaded grey bar represent the financial crisis of 2007-2008 (December 2007 - June 2009, according to NBER).}
+	\label{fig: varcts5}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\includegraphics{Figures/varc77ts10.pdf}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Time-series of VaR and ES for different industries ($\alpha=10\%$).}
+		The figure shows the time-series of VaR (red line) and ES (blue line) at the 90\% confidence level for the cross-sectional averages of the different industries in the dataset. Breaks in the lines represent missing data. The y-axis is rescaled in each panel. The period spanned is January 2000 - December 2015. Data are expressed in percentage of the underlying stock price. The shaded grey bar represent the financial crisis of 2007-2008 (December 2007 - June 2009, according to NBER).}
+	\label{fig: varcts10}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.9\width}{!}{\includegraphics{Figures/varc77ts15.pdf}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Time-series of VaR and ES for different industries ($\alpha=15\%$).}
+		The figure shows the time-series of VaR (red line) and ES (blue line) at the 85\% confidence level for the cross-sectional averages of the different industries in the dataset. Breaks in the lines represent missing data. The y-axis is rescaled in each panel. The period spanned is January 2000 - December 2015. Data are expressed in percentage of the underlying stock price. The shaded grey bar represent the financial crisis of 2007-2008 (December 2007 - June 2009, according to NBER).}
+	\label{fig: varcts15}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.6\width}{!}{\includegraphics{Figures/varc77tsmkt5.pdf}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Time-series of VaR and ES for the S\&P500 and the financial sector ($\alpha=5\%$).}
+		The figure shows the time-series of VaR (red line) and ES (blue line) at the 5\% confidence level for the S\&P500 and the financial sector SPDR. Breaks in the lines represent missing data. The y-axis is rescaled in each panel. The period spanned is January 2000 - December 2015. Data are expressed in percentage of the underlying stock price. The shaded grey bar represent the financial crisis of 2007-2008 (December 2007 - June 2009, according to NBER).}
+	\label{fig: varctsmkt5}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.6\width}{!}{\includegraphics{Figures/varc77tsmkt10.pdf}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Time-series of VaR and ES for the S\&P500 and the financial sector ($\alpha=5\%$).}
+		The figure shows the time-series of VaR (red line) and ES (blue line) at the 10\% confidence level for the S\&P500 and the financial sector SPDR. Breaks in the lines represent missing data. The y-axis is rescaled in each panel. The period spanned is January 2000 - December 2015. Data are expressed in percentage of the underlying stock price. The shaded grey bar represent the financial crisis of 2007-2008 (December 2007 - June 2009, according to NBER).}
+	\label{fig: varctsmkt10}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.6\width}{!}{\includegraphics{Figures/varc77tsmkt15.pdf}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Time-series of VaR and ES for the S\&P500 and the financial sector ($\alpha=15\%$).}
+		The figure shows the time-series of VaR (red line) and ES (blue line) at the 15\% confidence level for the S\&P500 and the financial sector SPDR. Breaks in the lines represent missing data. The y-axis is rescaled in each panel. The period spanned is January 2000 - December 2015. Data are expressed in percentage of the underlying stock price. The shaded grey bar represent the financial crisis of 2007-2008 (December 2007 - June 2009, according to NBER).}
+	\label{fig: varctsmkt15}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.6\width}{!}{\includegraphics{Figures/isvsoos.pdf}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Time series of CoVaR for large financial institutions in the 4 different groups.}
+		The figure shows the time series of monthly CoVaR estimated in sample (red line) and out of sample (blue line) for AIG (upper left panel), American Express (upper right panel), Goldman Sachs (bottom left panel), and JP Morgan Chase (bottom right panel). In the out of sample estimations the first half of each institution's sample is used for the initial estimation, then a moving window is employed. All estimates assume $\alpha = 5\%$, and the S\&P500 as system.}
+	\label{fig: isvsoos}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\resizebox{1\textwidth}{!}{\includegraphics{Figures/tscomp.pdf}}
+	\captionsetup{singlelinecheck=true, font = footnotesize}
+	\caption{
+		\textbf{Time series of average $\Delta$CoVaR by industry groups.}
+		The figure shows the time series of industry average monthly $\Delta$CoVaR estimated from options (red line), and through a quantile regression (blue line). The left y-axes refer to the option-implied measure, while the right axis to the quantile regression $\Delta$CoVaR. All estimates assume $\alpha = 5\%$, and the S\&P500 as system. The period spanned is January 2000 - December 2015. The shaded grey bar represent the financial crisis of 2007-2008 (December 2007 - June 2009, according to NBER).}
+	\label{fig: tscomp}
+\end{figure}
+
+\begin{comment}
+\begin{figure}[H]
+\centering
+\subfloat[][\emph{AIG}.]
+{\includegraphics[width=.45\textwidth]{Figures/scatterAIG.pdf}} \quad
+\subfloat[][\emph{American Express}.]
+{\includegraphics[width=.45\textwidth]{Figures/scatterAXP.pdf}} \\
+ \subfloat[][\emph{Bank of America}.]
+{\includegraphics[width=.45\textwidth]{Figures/scatterBAC.pdf}} \quad
+\subfloat[][\emph{BB\&T Corp}.]
+{\includegraphics[width=.45\textwidth]{Figures/scatterBBT.pdf}} \\
+\subfloat[][\emph{The Bank of New York Mellon Corp}.]
+{\includegraphics[width=.45\textwidth]{Figures/scatterBK.pdf}} \quad
+\subfloat[][\emph{BlackRock Inc}.]
+{\includegraphics[width=.45\textwidth]{Figures/scatterBLK.pdf}}
+\caption{\textbf{Scatter plot and fitted line for the VaR of single institutions against the S\&P500.}}
+\label{fig:scattervar}
+\end{figure}
+
+
+\begin{figure}[H]\ContinuedFloat
+	\centering
+		\subfloat[][\emph{Berkshire Hathaway}.]
+	{\includegraphics[width=.45\textwidth]{Figures/scatterBRK.pdf}} \quad
+	\subfloat[][\emph{Citi Group}.]
+	{\includegraphics[width=.45\textwidth]{Figures/scatterC.pdf}} \\
+	\subfloat[][\emph{Capital One Financial}.]
+	{\includegraphics[width=.45\textwidth]{Figures/scatterCOF.pdf}} \quad
+	\subfloat[][\emph{Goldman Sachs}.]
+	{\includegraphics[width=.45\textwidth]{Figures/scatterGS.pdf}} \\
+	\subfloat[][\emph{JP Morgan Chase}.]
+	{\includegraphics[width=.45\textwidth]{Figures/scatterJPM.pdf}} \quad
+	\subfloat[][\emph{Metlife}.]
+	{\includegraphics[width=.45\textwidth]{Figures/scatterMET.pdf}} 
+	\caption{\textbf{Scatter plot and fitted line for the VaR of single institutions against the S\&P500 (continued).}}
+\end{figure}
+\end{comment}
+
+\end{document}
